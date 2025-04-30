@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animation keyframes */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+  50% {
+    filter: brightness(1.2);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.5) translateY(20px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1) translateY(-10px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Utility classes */
+.animate-bounce {
+  animation: bounce 1s infinite ease-in-out;
+}
+
+.animate-float {
+  animation: float 5s infinite ease-in-out;
+}
+
+.animate-ripple {
+  animation: ripple 5s infinite linear;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s infinite ease-in-out;
+}
+
+.walking {
+  animation: bounce 0.4s ease-in-out;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+/* Ease functions */
+.ease-bounce {
+  transition-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
