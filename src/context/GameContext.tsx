@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { 
-  Stone, 
-  GameMode, 
-  Character, 
-  GameStatus, 
-  WordHistory 
+import { createContext, useContext, useReducer, ReactNode, Dispatch } from 'react';
+import {
+  Stone,
+  GameMode,
+  Character,
+  GameStatus,
+  WordHistory
 } from '../types/gameTypes';
 import { characters } from '../data/characters';
 import { getRandomCharacter } from '../utils/gameUtils';
@@ -64,9 +64,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         currentPosition: action.payload,
-        score: state.gameStatus === 'won' ? state.score : 
-          action.payload >= state.targetPosition 
-            ? state.score + Math.floor(state.timeRemaining * 10)
+        score: state.gameStatus === 'won' ? state.score :
+          action.payload >= state.targetPosition
+            ? state.score + (state.gameMode === 'timed' ? Math.floor(state.timeRemaining * 10) : 0)
             : state.score
       };
     case 'SET_GAME_MODE':
@@ -119,7 +119,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 // Create context
 interface GameContextType {
   state: GameState;
-  dispatch: React.Dispatch<GameAction>;
+  dispatch: Dispatch<GameAction>;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);

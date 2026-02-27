@@ -1,16 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
-import RiverBackground from './RiverBackground';
+import GameScene3D from './GameScene3D';
 import WordInput from './WordInput';
-import SteppingStones from './SteppingStones';
-import Character from './Character';
 import GameStatus from './GameStatus';
 import GameOver from './GameOver';
 import { playSound } from '../utils/soundUtils';
 
-const GameScreen: React.FC = () => {
+const GameScreen = () => {
   const { state, dispatch } = useGame();
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   // Start game logic
   useEffect(() => {
@@ -51,9 +49,9 @@ const GameScreen: React.FC = () => {
       state.currentPosition >= state.targetPosition
     ) {
       dispatch({ type: 'SET_GAME_STATUS', payload: 'won' });
-      dispatch({ 
-        type: 'SET_MESSAGE', 
-        payload: 'You made it across! Great job!' 
+      dispatch({
+        type: 'SET_MESSAGE',
+        payload: 'You made it across! Great job!'
       });
       playSound('win');
     }
@@ -61,26 +59,28 @@ const GameScreen: React.FC = () => {
 
   return (
     <div className="w-full h-screen relative overflow-hidden">
-      <RiverBackground />
-      
-      <div className="absolute inset-0 flex flex-col justify-between">
+      <GameScene3D />
+
+      <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
         {/* Game status bar */}
-        <GameStatus />
-        
+        <div className="pointer-events-auto">
+          <GameStatus />
+        </div>
+
         {/* Game area */}
         <div className="flex-grow relative">
-          <SteppingStones />
-          <Character />
         </div>
-        
-        {/* Word input area */}
-        <div className="p-4 bg-white/80 backdrop-blur-sm">
-          {state.gameStatus === 'playing' ? (
+
+        {/* Word input area - absolute positioning so it doesn't push layout */}
+        {state.gameStatus === 'playing' ? (
+          <div className="absolute bottom-0 w-full p-4 bg-white/80 backdrop-blur-sm pointer-events-auto">
             <WordInput />
-          ) : (
+          </div>
+        ) : (
+          <div className="absolute inset-0 z-50 pointer-events-auto flex items-center justify-center p-4">
             <GameOver />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
