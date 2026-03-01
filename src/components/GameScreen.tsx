@@ -77,7 +77,7 @@ const GameScreen = () => {
             <WordInput />
           </div>
         ) : (
-          <div className="absolute inset-0 z-50 pointer-events-auto flex items-center justify-center p-4">
+          <div className="absolute top-0 left-0 w-full h-full z-[99999] bg-black/60 backdrop-blur-sm pointer-events-auto flex items-center justify-center p-4">
             <GameOver />
           </div>
         )}

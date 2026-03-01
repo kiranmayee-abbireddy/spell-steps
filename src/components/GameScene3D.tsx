@@ -218,8 +218,10 @@ const SteppingStone = ({ position, width, isSpecial, word }: { position: [number
     return (
         <group position={position}>
             <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.2} floatingRange={[-0.05, 0.05]}>
-                <mesh receiveShadow castShadow position={[0, 0, 0]}>
-                    <cylinderGeometry args={[width, width, 0.4, 32]} />
+                {/* Scale the X axis to stretch the cylinder into an oval for longer words */}
+                <mesh receiveShadow castShadow position={[0, 0, 0]} scale={[Math.max(1, width / 0.8), 1, 1]}>
+                    {/* Keep base radius stable, letting scale stretch it */}
+                    <cylinderGeometry args={[0.8, 0.8, 0.4, 32]} />
                     <meshStandardMaterial
                         color={isSpecial ? '#f59e0b' : '#78716c'}
                         roughness={0.6}
