@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, Html, Float, ContactShadows, OrbitControls, Sky, Stars, Sparkles } from '@react-three/drei';
+import { Environment, Html, Float, ContactShadows, OrbitControls, Stars, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 import { useGame } from '../context/GameContext';
 
@@ -24,13 +24,13 @@ const initialThemes: ThemeDef[] = [
 
 const themeComponents = {
     waters: [
-        { water: "#0ea5e9", waterEmissive: "#0284c7" },
-        { water: "#a855f7", waterEmissive: "#9333ea" },
-        { water: "#38bdf8", waterEmissive: "#0284c7" },
-        { water: "#ef4444", waterEmissive: "#dc2626" },
-        { water: "#ec4899", waterEmissive: "#db2777" },
-        { water: "#22c55e", waterEmissive: "#16a34a" },
-        { water: "#f59e0b", waterEmissive: "#d97706" }
+        { water: "#0ea5e9", waterEmissive: "#0284c7", background: '#0f172a' }, // Blue -> Navy
+        { water: "#a855f7", waterEmissive: "#9333ea", background: '#1e1b4b' }, // Purple -> Dark Indigo
+        { water: "#38bdf8", waterEmissive: "#0284c7", background: '#082f49' }, // Light Blue -> Dark Sky
+        { water: "#ef4444", waterEmissive: "#dc2626", background: '#450a0a' }, // Red -> Dark Red
+        { water: "#ec4899", waterEmissive: "#db2777", background: '#4c1d95' }, // Pink -> Dark Violet
+        { water: "#22c55e", waterEmissive: "#16a34a", background: '#022c22' }, // Green -> Dark Emerald
+        { water: "#f59e0b", waterEmissive: "#d97706", background: '#451a03' }  // Orange -> Dark Brown
     ],
     banks: ["#166534", "#92400e", "#e2e8f0", "#292524", "#312e81", "#1e3a8a", "#064e3b"],
     trees: [
@@ -42,7 +42,6 @@ const themeComponents = {
         { tree1: "#14b8a6", tree2: "#2dd4bf" },
         { tree1: "#f43f5e", tree2: "#fb7185" }
     ],
-    backgrounds: ['#0f172a', '#1e1b4b', '#450a0a', '#172554', '#022c22', '#2e1065', '#000000'],
     treeTypes: ['pine', 'round', 'bare', 'crystal'] as TreeType[],
     particleTypes: ['fireflies', 'leaves', 'snow', 'embers', 'magic'] as ParticleType[]
 };
@@ -63,7 +62,6 @@ const getThemeForLevel = (level: number): ThemeDef => {
         bank: themeComponents.banks[Math.floor(pseudoRandom(s + 1) * themeComponents.banks.length)],
         ...themeComponents.trees[Math.floor(pseudoRandom(s + 2) * themeComponents.trees.length)],
         rayleigh: 0.5 + pseudoRandom(s + 3) * 7.5,
-        background: themeComponents.backgrounds[Math.floor(pseudoRandom(s + 4) * themeComponents.backgrounds.length)],
         treeType: themeComponents.treeTypes[Math.floor(pseudoRandom(s + 5) * themeComponents.treeTypes.length)],
         particleType: themeComponents.particleTypes[Math.floor(pseudoRandom(s + 6) * themeComponents.particleTypes.length)]
     };
