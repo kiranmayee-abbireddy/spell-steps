@@ -57,21 +57,25 @@ const TitleScreen = ({ onStartGame }: TitleScreenProps) => {
               How to Play
             </h2>
             <ul className="space-y-4 text-lg font-medium">
-              <li className="flex items-center bg-sky-50 p-3 rounded-xl">
+              <li className="flex items-center bg-sky-50 p-3 rounded-xl border-l-4 border-sky-400">
                 <span className="text-2xl mr-3">🔤</span>
                 <span>Type magic words to build stones across the river!</span>
               </li>
-              <li className="flex items-center bg-blue-50 p-3 rounded-xl">
+              <li className="flex items-center bg-blue-50 p-3 rounded-xl border-l-4 border-blue-400">
                 <span className="text-2xl mr-3">📏</span>
-                <span>Longer words = BIGGER stones!</span>
+                <span>Longer words make <b>MASSIVE</b> oval stones that bridge more distance!</span>
               </li>
-              <li className="flex items-center bg-indigo-50 p-3 rounded-xl">
-                <span className="text-2xl mr-3">🌟</span>
-                <span>Special long words make glowing stones & give bonus points!</span>
+              <li className="flex items-center bg-yellow-50 p-3 rounded-xl border-l-4 border-yellow-400">
+                <span className="text-2xl mr-3">💡</span>
+                <span><b>Click a stone</b> to reveal its meaning, synonyms, and antonyms!</span>
               </li>
-              <li className="flex items-center bg-purple-50 p-3 rounded-xl">
-                <span className="text-2xl mr-3">⏱️</span>
-                <span>Timed Mode: Race the clock!</span>
+              <li className="flex items-center bg-purple-50 p-3 rounded-xl border-l-4 border-purple-400">
+                <span className="text-2xl mr-3">🎭</span>
+                <span>Reach <b>Level 5, 10, 15...</b> to unlock rare magical character skins!</span>
+              </li>
+              <li className="flex items-center bg-emerald-50 p-3 rounded-xl border-l-4 border-emerald-400">
+                <span className="text-2xl mr-3">🌊</span>
+                <span>Watch out! The river gets <b>physically wider</b> as you level up!</span>
               </li>
             </ul>
             <button
