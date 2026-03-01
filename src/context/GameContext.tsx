@@ -117,20 +117,33 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         message: action.payload
       };
-    case 'NEXT_LEVEL':
+    case 'NEXT_LEVEL': {
+      const nextLevel = state.level + 1;
+      const unlockedNewSkin = state.level % 5 === 0;
+      let newCharacter = state.character;
+      let extraMessage = '';
+
+      if (unlockedNewSkin) {
+        const availableCharacters = characters.filter(c => c.id !== state.character.id);
+        newCharacter = availableCharacters[Math.floor(Math.random() * availableCharacters.length)];
+        extraMessage = `Unlocked new skin: ${newCharacter.name} ${newCharacter.sprite}! 🎉`;
+      }
+
       return {
         ...state,
-        level: state.level + 1,
+        level: nextLevel,
+        character: newCharacter,
         // Increase distance by 20 units each level
         targetPosition: state.targetPosition + 20,
         currentPosition: 0,
         stones: [],
         words: [],
         gameStatus: 'ready',
-        message: `Level ${state.level + 1}! The river is getting wider.`,
+        message: unlockedNewSkin ? extraMessage : `Level ${nextLevel}! The river is getting wider.`,
         // Give base time + extra time for wider rivers in timed mode
         timeRemaining: state.gameMode === 'timed' ? 60 + (state.level * 10) : Infinity
       };
+    }
     case 'RESET_GAME':
       return {
         ...initialState,
