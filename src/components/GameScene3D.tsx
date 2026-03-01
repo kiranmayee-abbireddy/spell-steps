@@ -238,7 +238,7 @@ const SteppingStone = ({ position, width, isSpecial, word }: { position: [number
                             {word}
                         </div>
                         {showTooltip && (
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-56 bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] text-left border-2 border-sky-300 pointer-events-none z-50">
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-56 bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] text-left border-2 border-sky-300 pointer-events-none z-[9999]">
                                 {loading ? (
                                     <div className="text-xs text-sky-600 animate-pulse text-center font-bold">Unlocking magic... ✨</div>
                                 ) : details ? (
@@ -398,7 +398,7 @@ const Scene = () => {
 
 const GameScene3D = () => {
     return (
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0">
             <Canvas shadows camera={{ position: [0, 6, 14], fov: 45 }}>
                 <Scene />
             </Canvas>

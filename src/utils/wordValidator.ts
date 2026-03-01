@@ -46,20 +46,37 @@ export const fetchWordDetails = async (word: string): Promise<WordDetails | null
     const data = await res.json();
     if (data && data.length > 0) {
       const entry = data[0];
-      const meaningObj = entry.meanings?.[0];
-      const def = meaningObj?.definitions?.[0]?.definition || "Meaning unknown.";
 
       let synonyms: string[] = [];
       let antonyms: string[] = [];
+      let allDefs: string[] = [];
 
       entry.meanings.forEach((m: any) => {
         if (m.synonyms) synonyms.push(...m.synonyms);
         if (m.antonyms) antonyms.push(...m.antonyms);
         m.definitions.forEach((d: any) => {
+          if (d.definition) allDefs.push(d.definition);
           if (d.synonyms) synonyms.push(...d.synonyms);
           if (d.antonyms) antonyms.push(...d.antonyms);
         });
       });
+
+      // Filter out overly simplistic definitions that just say "something that is X"
+      const wordLower = (entry.word || word).toLowerCase();
+      const goodDefs = allDefs.filter(d => {
+        const dLower = d.toLowerCase();
+        const simplistic = [
+          `that is ${wordLower}`,
+          `who is ${wordLower}`,
+          `being ${wordLower}`,
+          `to be ${wordLower}`
+        ];
+        return dLower.length > 5 && !simplistic.some(s => dLower.includes(s));
+      });
+
+      const bestDef = goodDefs.length > 0
+        ? goodDefs[0]
+        : (allDefs[0] || "Meaning unknown.");
 
       // Deduplicate arrays and slice max 5
       synonyms = Array.from(new Set(synonyms)).slice(0, 5);
@@ -67,7 +84,7 @@ export const fetchWordDetails = async (word: string): Promise<WordDetails | null
 
       return {
         word: entry.word || word,
-        meaning: def,
+        meaning: bestDef,
         synonyms,
         antonyms
       };
