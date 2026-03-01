@@ -196,7 +196,7 @@ const Bank = ({ position, color, side, tree1, tree2, treeType }: { position: [nu
     );
 };
 
-const SteppingStone = ({ position, width, isSpecial, word }: { position: [number, number, number], width: number, isSpecial: boolean, word: string }) => {
+const SteppingStone = ({ position, width, isSpecial, word, gameStatus }: { position: [number, number, number], width: number, isSpecial: boolean, word: string, gameStatus: string }) => {
     const [showTooltip, setShowTooltip] = useState(false);
     const [details, setDetails] = useState<WordDetails | null>(null);
     const [loading, setLoading] = useState(false);
@@ -230,50 +230,52 @@ const SteppingStone = ({ position, width, isSpecial, word }: { position: [number
                         emissiveIntensity={isSpecial ? 0.4 : 0}
                     />
                 </mesh>
-                <Html position={[0, 0.6, 0]} center zIndexRange={[100, 0]}>
-                    <div className="relative pointer-events-auto">
-                        <div
-                            onClick={handleClick}
-                            className="bg-white/90 px-3 py-1 rounded-lg text-sm font-bold text-sky-900 shadow-md cursor-pointer hover:bg-white hover:scale-110 active:scale-95 transition-all outline-none"
-                            style={{ WebkitTapHighlightColor: 'transparent' }}
-                        >
-                            {word}
-                        </div>
-                        {showTooltip && (
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-56 bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] text-left border-2 border-sky-300 pointer-events-none z-[9999] break-words whitespace-normal">
-                                {loading ? (
-                                    <div className="text-xs text-sky-600 animate-pulse text-center font-bold break-words">Unlocking magic... ✨</div>
-                                ) : details ? (
-                                    <div className="flex flex-col gap-2">
-                                        <div className="font-extrabold text-sky-900 text-lg capitalize border-b-2 border-sky-100 pb-1 break-words">{details.word}</div>
-                                        <div className="text-sm text-gray-700 italic leading-snug font-medium break-words">"{details.meaning}"</div>
-                                        {details.synonyms.length > 0 && (
-                                            <div className="text-xs text-green-700 bg-green-50 p-1.5 rounded-md mt-1 break-words">
-                                                <span className="font-black">SYN:</span> {details.synonyms.join(', ')}
-                                            </div>
-                                        )}
-                                        {details.antonyms.length > 0 && (
-                                            <div className="text-xs text-red-700 bg-red-50 p-1.5 rounded-md mt-1 break-words">
-                                                <span className="font-black">ANT:</span> {details.antonyms.join(', ')}
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="text-xs font-bold text-gray-500 text-center break-words">Uncharted magic. No details found!</div>
-                                )}
-                                {/* Triangle pointer */}
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 border-8 border-transparent border-t-sky-300"></div>
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-[7px] border-transparent border-t-white"></div>
+                {gameStatus === 'playing' && (
+                    <Html position={[0, 0.6, 0]} center zIndexRange={[100, 0]}>
+                        <div className="relative pointer-events-auto">
+                            <div
+                                onClick={handleClick}
+                                className="bg-white/90 px-3 py-1 rounded-lg text-sm font-bold text-sky-900 shadow-md cursor-pointer hover:bg-white hover:scale-110 active:scale-95 transition-all outline-none"
+                                style={{ WebkitTapHighlightColor: 'transparent' }}
+                            >
+                                {word}
                             </div>
-                        )}
-                    </div>
-                </Html>
+                            {showTooltip && (
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-56 bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] text-left border-2 border-sky-300 pointer-events-none z-[9999] break-words whitespace-normal">
+                                    {loading ? (
+                                        <div className="text-xs text-sky-600 animate-pulse text-center font-bold break-words">Unlocking magic... ✨</div>
+                                    ) : details ? (
+                                        <div className="flex flex-col gap-2">
+                                            <div className="font-extrabold text-sky-900 text-lg capitalize border-b-2 border-sky-100 pb-1 break-words">{details.word}</div>
+                                            <div className="text-sm text-gray-700 italic leading-snug font-medium break-words">"{details.meaning}"</div>
+                                            {details.synonyms.length > 0 && (
+                                                <div className="text-xs text-green-700 bg-green-50 p-1.5 rounded-md mt-1 break-words">
+                                                    <span className="font-black">SYN:</span> {details.synonyms.join(', ')}
+                                                </div>
+                                            )}
+                                            {details.antonyms.length > 0 && (
+                                                <div className="text-xs text-red-700 bg-red-50 p-1.5 rounded-md mt-1 break-words">
+                                                    <span className="font-black">ANT:</span> {details.antonyms.join(', ')}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="text-xs font-bold text-gray-500 text-center break-words">Uncharted magic. No details found!</div>
+                                    )}
+                                    {/* Triangle pointer */}
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 border-8 border-transparent border-t-sky-300"></div>
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-[7px] border-transparent border-t-white"></div>
+                                </div>
+                            )}
+                        </div>
+                    </Html>
+                )}
             </Float>
         </group>
     );
 };
 
-const Character3D = ({ position, sprite, name, isPlaying }: { position: [number, number, number], sprite: string, name: string, isPlaying: boolean }) => {
+const Character3D = ({ position, sprite, name, isPlaying, gameStatus }: { position: [number, number, number], sprite: string, name: string, isPlaying: boolean, gameStatus: string }) => {
     const groupRef = useRef<THREE.Group>(null);
 
     useFrame((state) => {
@@ -291,16 +293,18 @@ const Character3D = ({ position, sprite, name, isPlaying }: { position: [number,
 
     return (
         <group ref={groupRef} position={position}>
-            <Html position={[0, 0.5, 0]} center zIndexRange={[100, 0]}>
-                <div className="flex flex-col items-center pointer-events-none transform -translate-y-4">
-                    <div className="bg-white/90 px-2 py-0.5 rounded-full text-xs font-bold text-gray-800 shadow-md mb-1 whitespace-nowrap">
-                        {name}
+            {gameStatus === 'playing' && (
+                <Html position={[0, 0.5, 0]} center zIndexRange={[100, 0]}>
+                    <div className="flex flex-col items-center pointer-events-none transform -translate-y-4">
+                        <div className="bg-white/90 px-2 py-0.5 rounded-full text-xs font-bold text-gray-800 shadow-md mb-1 whitespace-nowrap">
+                            {name}
+                        </div>
+                        <div className="text-5xl filter drop-shadow-md">
+                            {sprite}
+                        </div>
                     </div>
-                    <div className="text-5xl filter drop-shadow-md">
-                        {sprite}
-                    </div>
-                </div>
-            </Html>
+                </Html>
+            )}
         </group>
     );
 };
@@ -357,8 +361,8 @@ const Scene = () => {
             {/* Stepping Stones */}
             {stones.map((stone) => {
                 const xPos = mapPosition(stone.position);
-                // Support legacy format (stone.size = 3 to 12) mapping to radius (0.6 - 1.2), and new direct 3D radius mapping
-                const radius = stone.size > 2 ? Math.max(0.6, Math.min(1.2, stone.size * 0.15)) : stone.size;
+                // Dynamically base the oval width mostly on word length, capped logically
+                const radius = Math.max(0.6, Math.min(3.5, 0.2 + stone.word.length * 0.15));
 
                 return (
                     <SteppingStone
@@ -367,6 +371,7 @@ const Scene = () => {
                         width={radius}
                         isSpecial={stone.special || false}
                         word={stone.word}
+                        gameStatus={gameStatus}
                     />
                 );
             })}
@@ -377,6 +382,7 @@ const Scene = () => {
                 sprite={character.sprite}
                 name={character.name}
                 isPlaying={gameStatus === 'playing'}
+                gameStatus={gameStatus}
             />
 
             {/* Water reflection/shadows */}
