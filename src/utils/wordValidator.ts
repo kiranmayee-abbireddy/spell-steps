@@ -82,11 +82,15 @@ export const fetchWordDetails = async (word: string): Promise<WordDetails | null
         return dLower.length > 5 && !containsWordObj && !simplistic.some(s => dLower.includes(s));
       });
 
-      // For kids, prefer the shortest definition because it's usually the simplest to understand
-      goodDefs.sort((a, b) => a.length - b.length);
+      // Most definitions are ordered by prominence. Picking the absolute shortest
+      // frequently results in bizarre semantic secondary/tertiary shorthand meanings.
+      // Instead, we just take the first meaning that passes the strict repetition filters!
+      // But we will gently avoid massively long definitions over 120 chars if a simpler one exists closer to the front. 
+      const conciseDefs = goodDefs.filter(d => d.length < 120);
+      const preferredDefs = conciseDefs.length > 0 ? conciseDefs : goodDefs;
 
-      const bestDef = goodDefs.length > 0
-        ? goodDefs[0]
+      const bestDef = preferredDefs.length > 0
+        ? preferredDefs[0]
         : (allDefs[0] || "Meaning unknown.");
 
       // Deduplicate arrays and slice max 5
