@@ -17,7 +17,7 @@ const River = () => {
 
     return (
         <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
-            <planeGeometry args={[100, 30]} />
+            <planeGeometry args={[500, 500]} />
             <meshStandardMaterial
                 ref={materialRef}
                 color="#0ea5e9"
@@ -52,10 +52,14 @@ const Tree = ({ position, scale = 1 }: { position: [number, number, number], sca
 );
 
 const Bank = ({ position, color, side }: { position: [number, number, number], color: string, side: 'left' | 'right' }) => {
+    const depth = 500;
+    const width = 250;
+    const meshX = side === 'left' ? 5 - width / 2 : -5 + width / 2;
+
     return (
         <group position={position}>
-            <mesh receiveShadow castShadow position={[0, -0.5, 0]}>
-                <boxGeometry args={[10, 2, 30]} />
+            <mesh receiveShadow castShadow position={[meshX, -0.5, 0]}>
+                <boxGeometry args={[width, 2, depth]} />
                 <meshStandardMaterial color={color} roughness={0.8} />
             </mesh>
 
@@ -64,6 +68,14 @@ const Bank = ({ position, color, side }: { position: [number, number, number], c
             <Tree position={[side === 'left' ? 0 : 0, 0.5, -2]} scale={0.8} />
             <Tree position={[side === 'left' ? 3 : -3, 0.5, 4]} scale={1.5} />
             <Tree position={[side === 'left' ? 1 : -1, 0.5, 8]} scale={1.1} />
+
+            {/* Additional background trees */}
+            <Tree position={[side === 'left' ? 5 : -5, 0.5, -15]} scale={1.6} />
+            <Tree position={[side === 'left' ? 2 : -2, 0.5, -25]} scale={1.3} />
+            <Tree position={[side === 'left' ? 8 : -8, 0.5, 15]} scale={1.8} />
+            <Tree position={[side === 'left' ? 4 : -4, 0.5, 30]} scale={1.4} />
+            <Tree position={[side === 'left' ? -5 : 5, 0.5, 40]} scale={1.5} />
+            <Tree position={[side === 'left' ? 2 : -2, 0.5, 50]} scale={1.2} />
         </group>
     );
 };
