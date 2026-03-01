@@ -6,28 +6,32 @@ import { wordList } from '../data/dictionary';
  */
 export const isValidWord = async (word: string): Promise<boolean> => {
   // Immediately return false for invalid input
-  if (!word || word.length < 2) return false;
+  const cleanWord = word.trim().toLowerCase();
+  if (!cleanWord || cleanWord.length < 2) return false;
 
-  // Check if the word has already been used before
-  // (This could be implemented by checking against state.words)
-
-  // First try local dictionary (faster)
-  if (wordList.includes(word.toLowerCase())) {
+  // First try local dictionary (fastest)
+  if (wordList.includes(cleanWord)) {
     return true;
   }
 
   try {
-    // If not in local dictionary, use free dictionary API
-    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+    // Try primary dictionary API
+    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${cleanWord}`);
+    if (response.ok) return true;
 
-    // If the response is ok (status in the range 200-299)
-    return response.ok;
+    // Fallback: Datamuse API is much more comprehensive for word existence
+    const datamuseRes = await fetch(`https://api.datamuse.com/words?sp=${cleanWord}&max=1`);
+    if (datamuseRes.ok) {
+      const data = await datamuseRes.json();
+      // If we got a direct match, it's a valid word
+      return data.length > 0 && data[0].word.toLowerCase() === cleanWord;
+    }
+
+    return false;
   } catch (error) {
     console.error('Error validating word:', error);
-
-    // Fall back to local validation in case of network error
-    // Accept words longer than 3 letters as valid
-    return word.length >= 3;
+    // Fall back to length check in case of total network failure
+    return cleanWord.length >= 3;
   }
 };
 
@@ -41,7 +45,28 @@ export interface WordDetails {
 export const fetchWordDetails = async (word: string): Promise<WordDetails | null> => {
   try {
     const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
-    if (!res.ok) return null;
+
+    if (!res.ok) {
+      // Fallback to Datamuse for basic information
+      const dmRes = await fetch(`https://api.datamuse.com/words?sp=${word}&md=d&max=1`);
+      if (dmRes.ok) {
+        const dmData = await dmRes.json();
+        if (dmData && dmData.length > 0) {
+          const item = dmData[0];
+          // Datamuse returns definitions as "partOfSpeech\tdefinition"
+          const rawDef = item.defs?.[0] || "";
+          const cleanDef = rawDef.includes('\t') ? rawDef.split('\t')[1] : rawDef;
+
+          return {
+            word: item.word || word,
+            meaning: cleanDef || "A common English word.",
+            synonyms: [], // Datamuse needs separate calls for these, keep it simple for fallback
+            antonyms: []
+          };
+        }
+      }
+      return null;
+    }
 
     const data = await res.json();
     if (data && data.length > 0) {
