@@ -40,7 +40,7 @@ const WordInput = () => {
       const score = calculateWordScore(word);
 
       // Generate a stone based on the word
-      const stone = generateStoneFromWord(word, state.currentPosition, score, state.stones.length, state.targetPosition);
+      const stone = generateStoneFromWord(word, state.currentPosition, score, state.stones.length);
 
       // Add stone to the game
       dispatch({ type: 'ADD_STONE', payload: stone });

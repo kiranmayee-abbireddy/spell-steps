@@ -42,8 +42,7 @@ export const generateStoneFromWord = (
   word: string,
   lastPosition: number,
   score: number,
-  stoneCount: number,
-  targetPosition: number = 100
+  stoneCount: number
 ): Stone => {
   const id = `stone-${stoneCount}-${word}`;
   const length = word.length;
@@ -60,9 +59,10 @@ export const generateStoneFromWord = (
   // Calculate 3D distance between this center and last Center
   const distance3D = (radius3D * 2) + gap3D;
 
-  // Game coordinates map 20 3D units horizontally between banks
-  // Scale the 3D unit distance to game coordinates based on current targetPosition
-  const distanceCoveredInGameUnits = distance3D * (targetPosition / 20);
+  // Game coordinates map 1 3D unit to 5 game units
+  // This constant scale ensures that as targetPosition increases per level, 
+  // it fundamentally requires more distance3D (and thus more words) to reach the end
+  const distanceCoveredInGameUnits = distance3D * 5;
 
   const position = lastPosition + distanceCoveredInGameUnits;
 

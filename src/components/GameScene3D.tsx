@@ -315,8 +315,9 @@ const Scene = () => {
 
     const theme = getThemeForLevel(level);
 
-    // Map Game Coordinates (0-100) to 3D Space (-10 to 10 on X axis)
-    const mapPosition = (p: number) => -10 + (p / targetPosition) * 20;
+    // Map Game Coordinates to 3D Space (1 3D unit = 5 Game units)
+    // As levels grow, targetPosition grows, meaning the 3D width dynamically expands!
+    const mapPosition = (p: number) => -(targetPosition / 10) + (p / 5);
 
     return (
         <>
@@ -354,9 +355,9 @@ const Scene = () => {
             {/* River */}
             <River waterColor={theme.water} emissiveColor={theme.waterEmissive} />
 
-            {/* Starting and Ending Banks */}
-            <Bank position={[-15, -0.5, 0]} color={theme.bank} side="left" tree1={theme.tree1} tree2={theme.tree2} treeType={theme.treeType} />
-            <Bank position={[15, -0.5, 0]} color={theme.bank} side="right" tree1={theme.tree1} tree2={theme.tree2} treeType={theme.treeType} />
+            {/* Starting and Ending Banks dynamically positioned to expand per level */}
+            <Bank position={[-(targetPosition / 10) - 5, -0.5, 0]} color={theme.bank} side="left" tree1={theme.tree1} tree2={theme.tree2} treeType={theme.treeType} />
+            <Bank position={[(targetPosition / 10) + 5, -0.5, 0]} color={theme.bank} side="right" tree1={theme.tree1} tree2={theme.tree2} treeType={theme.treeType} />
 
             {/* Stepping Stones */}
             {stones.map((stone) => {
