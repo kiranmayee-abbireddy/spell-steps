@@ -42,7 +42,8 @@ export const generateStoneFromWord = (
   word: string,
   lastPosition: number,
   score: number,
-  stoneCount: number
+  stoneCount: number,
+  targetPosition: number = 100
 ): Stone => {
   const id = `stone-${stoneCount}-${word}`;
   const length = word.length;
@@ -50,19 +51,26 @@ export const generateStoneFromWord = (
   // Special stone for longer or high-scoring words
   const isSpecial = length >= 6 || score >= 20;
 
-  // Stone size based on word length (minimum 3, maximum 12)
-  const size = Math.min(12, Math.max(3, length * 1.2));
+  // Determine 3D radius based directly on word length (longer word = wider stone)
+  const radius3D = Math.max(0.6, Math.min(2.5, 0.4 + length * 0.15));
 
-  // Calculate position (distance from start) based on last stone position and word length
-  // Longer words bridge more distance!
-  const distanceCovered = length * 1.5 + Math.random() * 2;
-  const position = lastPosition + distanceCovered;
+  // Small but guaranteed gap in 3D space to prevent overlap
+  const gap3D = 0.3 + Math.random() * 0.2;
+
+  // Calculate 3D distance between this center and last Center
+  const distance3D = (radius3D * 2) + gap3D;
+
+  // Game coordinates map 20 3D units horizontally between banks
+  // Scale the 3D unit distance to game coordinates based on current targetPosition
+  const distanceCoveredInGameUnits = distance3D * (targetPosition / 20);
+
+  const position = lastPosition + distanceCoveredInGameUnits;
 
   return {
     id,
     word,
     position,
-    size,
+    size: radius3D, // Save precise 3D radius instead of arbitrary length multiple
     special: isSpecial
   };
 };

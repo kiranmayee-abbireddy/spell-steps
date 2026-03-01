@@ -355,8 +355,8 @@ const Scene = () => {
             {/* Stepping Stones */}
             {stones.map((stone) => {
                 const xPos = mapPosition(stone.position);
-                // Stone size corresponds to difficulty/length - let's map size 4-8 to radius 0.6-1.2
-                const radius = Math.max(0.6, Math.min(1.2, stone.size * 0.15));
+                // Support legacy format (stone.size = 3 to 12) mapping to radius (0.6 - 1.2), and new direct 3D radius mapping
+                const radius = stone.size > 2 ? Math.max(0.6, Math.min(1.2, stone.size * 0.15)) : stone.size;
 
                 return (
                     <SteppingStone
