@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Spell Steps</string>
+    <string name="title_activity_main">Spell Steps</string>
+    <string name="package_name">com.kiranmayee.spellsteps</string>
+    <string name="custom_url_scheme">com.kiranmayee.spellsteps</string>
+</resources>
