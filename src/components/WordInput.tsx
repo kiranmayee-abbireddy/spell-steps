@@ -29,6 +29,19 @@ const WordInput = () => {
     // Clear input regardless of validity
     setInputWord('');
 
+    // Check if word has already been used in this level
+    const alreadyUsed = state.words.some(w => w.word === word);
+
+    if (alreadyUsed) {
+      dispatch({ type: 'SET_WORD_VALIDITY', payload: false });
+      dispatch({
+        type: 'SET_MESSAGE',
+        payload: `You already used "${word}" in this level! Try a new one.`
+      });
+      playSound('invalid');
+      return;
+    }
+
     // Check if word is valid
     const valid = await isValidWord(word);
 
