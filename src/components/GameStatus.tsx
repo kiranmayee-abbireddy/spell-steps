@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useGame } from '../context/GameContext';
 import { formatTime } from '../utils/gameUtils';
 import { longWords } from '../data/dictionary';
@@ -123,7 +124,7 @@ const GameStatus = () => {
       )}
 
       {/* Confirmation Modal */}
-      {showConfirmModal && (
+      {showConfirmModal && createPortal(
         <div className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-sm pointer-events-auto flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full text-center shadow-2xl border-4 border-fuchsia-400 transform transition-all animate-bounce-in">
             <div className="flex justify-center mb-4">
@@ -148,7 +149,8 @@ const GameStatus = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
