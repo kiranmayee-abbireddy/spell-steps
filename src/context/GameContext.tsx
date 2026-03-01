@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, ReactNode, Dispatch } from 'react';
+import { createContext, useContext, useReducer, ReactNode, Dispatch, useEffect } from 'react';
 import {
   Stone,
   GameMode,
@@ -22,6 +22,9 @@ interface GameState {
   targetPosition: number;
   lastWordValid: boolean | null;
   message: string;
+  level: number;
+  stars: number;
+  highScore: number;
 }
 
 // Initial game state
@@ -36,7 +39,10 @@ const initialState: GameState = {
   currentPosition: 0,
   targetPosition: 100,
   lastWordValid: null,
-  message: 'Type words to create stones and cross the river!'
+  message: 'Type words to create stones and cross the river!',
+  level: 1,
+  stars: 0,
+  highScore: 0
 };
 
 // Define action types
@@ -50,6 +56,7 @@ type GameAction =
   | { type: 'UPDATE_SCORE'; payload: number }
   | { type: 'SET_WORD_VALIDITY'; payload: boolean }
   | { type: 'SET_MESSAGE'; payload: string }
+  | { type: 'NEXT_LEVEL' }
   | { type: 'RESET_GAME' };
 
 // Create reducer function
@@ -90,11 +97,16 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         timeRemaining: action.payload
       };
-    case 'UPDATE_SCORE':
+    case 'UPDATE_SCORE': {
+      const newScore = state.score + action.payload;
       return {
         ...state,
-        score: state.score + action.payload
+        score: newScore,
+        // Earning 1 star for every 10 points
+        stars: Math.floor(newScore / 10),
+        highScore: Math.max(state.highScore ?? 0, newScore)
       };
+    }
     case 'SET_WORD_VALIDITY':
       return {
         ...state,
@@ -105,11 +117,28 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         message: action.payload
       };
+    case 'NEXT_LEVEL':
+      return {
+        ...state,
+        level: state.level + 1,
+        // Increase distance by 20 units each level
+        targetPosition: state.targetPosition + 20,
+        currentPosition: 0,
+        stones: [],
+        words: [],
+        gameStatus: 'ready',
+        message: `Level ${state.level + 1}! The river is getting wider.`,
+        // Give base time + extra time for wider rivers in timed mode
+        timeRemaining: state.gameMode === 'timed' ? 60 + (state.level * 10) : Infinity
+      };
     case 'RESET_GAME':
       return {
         ...initialState,
+        highScore: state.highScore,
         character: getRandomCharacter(characters),
-        gameMode: state.gameMode
+        gameMode: state.gameMode,
+        // In case gameMode was timed, reset time properly based on initial level 1
+        timeRemaining: state.gameMode === 'timed' ? 60 : Infinity
       };
     default:
       return state;
@@ -125,8 +154,25 @@ interface GameContextType {
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 // Provider component
+function init(defaultState: GameState): GameState {
+  try {
+    const saved = localStorage.getItem('spellStepsGameState');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { ...defaultState, ...parsed };
+    }
+  } catch (e) {
+    console.error('Failed to parse saved game state', e);
+  }
+  return defaultState;
+}
+
 export const GameProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(gameReducer, initialState);
+  const [state, dispatch] = useReducer(gameReducer, initialState, init);
+
+  useEffect(() => {
+    localStorage.setItem('spellStepsGameState', JSON.stringify(state));
+  }, [state]);
 
   return (
     <GameContext.Provider value={{ state, dispatch }}>

@@ -7,13 +7,20 @@ interface TitleScreenProps {
 }
 
 const TitleScreen = ({ onStartGame }: TitleScreenProps) => {
-  const { dispatch } = useGame();
+  const { state, dispatch } = useGame();
   const [showInstructions, setShowInstructions] = useState(false);
 
   const handleSetGameMode = (mode: 'casual' | 'timed') => {
+    dispatch({ type: 'RESET_GAME' });
     dispatch({ type: 'SET_GAME_MODE', payload: mode });
     onStartGame();
   };
+
+  const handleContinue = () => {
+    onStartGame();
+  };
+
+  const hasSavedGame = state.score > 0 || state.level > 1 || state.gameStatus === 'playing' || state.gameStatus === 'won';
 
   return (
     <div className="w-full max-w-2xl bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden transform transition-all border-4 border-blue-300">
@@ -30,6 +37,15 @@ const TitleScreen = ({ onStartGame }: TitleScreenProps) => {
         <p className="text-blue-100 text-xl font-bold tracking-wider relative z-10 bg-black/20 inline-block px-4 py-1 rounded-full">
           Magic Words, Magic Steps! ✨
         </p>
+
+        {state.highScore > 0 && (
+          <div className="absolute top-4 right-4 z-20 bg-yellow-400 border-b-4 border-yellow-600 px-4 py-2 rounded-2xl shadow-lg transform rotate-3">
+            <div className="text-[10px] font-black text-yellow-900 uppercase tracking-widest bg-white/40 rounded-full inline-block px-2 py-0.5 mb-1">High Score</div>
+            <div className="text-2xl font-black text-white drop-shadow-md flex items-center">
+              <span className="mr-1">🏆</span> {state.highScore}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Game instructions or mode selection */}
@@ -70,13 +86,25 @@ const TitleScreen = ({ onStartGame }: TitleScreenProps) => {
             <h2 className="text-2xl font-extrabold text-sky-700 mb-6 text-center">
               CHOOSE YOUR ADVENTURE!
             </h2>
+
+            {hasSavedGame && (
+              <button
+                onClick={handleContinue}
+                className="w-full mb-6 group relative bg-gradient-to-b from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white p-6 rounded-2xl transition-all transform hover:scale-[1.02] active:scale-95 shadow-[0_8px_0_rgb(37,99,235)] hover:shadow-[0_4px_0_rgb(37,99,235)] hover:translate-y-1"
+              >
+                <div className="absolute top-0 right-0 p-4 opacity-50 text-4xl group-hover:scale-125 transition-transform duration-300">🗺️</div>
+                <div className="font-extrabold text-2xl mb-1 shadow-black/20 drop-shadow-md text-left">Continue Journey</div>
+                <div className="text-blue-100 font-medium text-left">Level {state.level} • Score {state.score}</div>
+              </button>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <button
                 onClick={() => handleSetGameMode('casual')}
                 className="group relative bg-gradient-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white p-6 rounded-2xl transition-all transform hover:scale-105 active:scale-95 shadow-[0_8px_0_rgb(21,128,61)] hover:shadow-[0_4px_0_rgb(21,128,61)] hover:translate-y-1"
               >
                 <div className="absolute top-0 right-0 p-4 opacity-50 text-4xl group-hover:scale-125 transition-transform duration-300">🐢</div>
-                <div className="font-extrabold text-2xl mb-1 shadow-black/20 drop-shadow-md">Casual Play</div>
+                <div className="font-extrabold text-2xl mb-1 shadow-black/20 drop-shadow-md">New Casual</div>
                 <div className="text-green-100 font-medium">Take your time, have fun!</div>
               </button>
 
@@ -85,7 +113,7 @@ const TitleScreen = ({ onStartGame }: TitleScreenProps) => {
                 className="group relative bg-gradient-to-b from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white p-6 rounded-2xl transition-all transform hover:scale-105 active:scale-95 shadow-[0_8px_0_rgb(88,28,135)] hover:shadow-[0_4px_0_rgb(88,28,135)] hover:translate-y-1"
               >
                 <div className="absolute top-0 right-0 p-4 opacity-50 text-4xl group-hover:scale-125 transition-transform duration-300">⚡</div>
-                <div className="font-extrabold text-2xl mb-1 shadow-black/20 drop-shadow-md">Time Sprint</div>
+                <div className="font-extrabold text-2xl mb-1 shadow-black/20 drop-shadow-md">New Time Sprint</div>
                 <div className="text-purple-200 font-medium">Race against the clock!</div>
               </button>
             </div>
