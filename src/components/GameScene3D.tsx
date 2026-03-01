@@ -4,7 +4,23 @@ import { Environment, Html, Float, ContactShadows, OrbitControls, Sky, Stars, Sp
 import * as THREE from 'three';
 import { useGame } from '../context/GameContext';
 
-const River = () => {
+type TreeType = 'pine' | 'round' | 'bare' | 'crystal';
+type ParticleType = 'fireflies' | 'leaves' | 'snow' | 'embers' | 'magic';
+
+const themes: { water: string, waterEmissive: string, bank: string, tree1: string, tree2: string, rayleigh: number, background: string, treeType: TreeType, particleType: ParticleType }[] = [
+    // Level 1: Summer/Grass
+    { water: "#0ea5e9", waterEmissive: "#0284c7", bank: "#166534", tree1: "#22c55e", tree2: "#4ade80", rayleigh: 2, background: '#0f172a', treeType: 'pine', particleType: 'fireflies' },
+    // Level 2: Autumn
+    { water: "#a855f7", waterEmissive: "#9333ea", bank: "#92400e", tree1: "#ea580c", tree2: "#f59e0b", rayleigh: 4, background: '#1e1b4b', treeType: 'round', particleType: 'leaves' },
+    // Level 3: Winter
+    { water: "#38bdf8", waterEmissive: "#0284c7", bank: "#e2e8f0", tree1: "#94a3b8", tree2: "#cbd5e1", rayleigh: 0.5, background: '#0f172a', treeType: 'pine', particleType: 'snow' },
+    // Level 4: Volcanic
+    { water: "#ef4444", waterEmissive: "#dc2626", bank: "#292524", tree1: "#57534e", tree2: "#78716c", rayleigh: 8, background: '#450a0a', treeType: 'bare', particleType: 'embers' },
+    // Level 5: Magic
+    { water: "#ec4899", waterEmissive: "#db2777", bank: "#312e81", tree1: "#8b5cf6", tree2: "#d946ef", rayleigh: 3, background: '#172554', treeType: 'crystal', particleType: 'magic' },
+];
+
+const River = ({ waterColor, emissiveColor }: { waterColor: string, emissiveColor: string }) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
 
@@ -20,38 +36,90 @@ const River = () => {
             <planeGeometry args={[500, 500]} />
             <meshStandardMaterial
                 ref={materialRef}
-                color="#0ea5e9"
+                color={waterColor}
                 roughness={0.0}
                 metalness={0.8}
                 transparent
                 opacity={0.9}
-                emissive="#0284c7"
+                emissive={emissiveColor}
             />
         </mesh>
     );
 };
 
-const Tree = ({ position, scale = 1 }: { position: [number, number, number], scale?: number }) => (
-    <group position={position} scale={scale}>
-        {/* Trunk */}
-        <mesh position={[0, 0.5, 0]} castShadow>
-            <cylinderGeometry args={[0.2, 0.3, 1]} />
-            <meshStandardMaterial color="#5c4033" roughness={0.9} />
-        </mesh>
-        {/* Leaves - Bottom */}
-        <mesh position={[0, 1.2, 0]} castShadow>
-            <coneGeometry args={[1, 1.5, 8]} />
-            <meshStandardMaterial color="#22c55e" roughness={0.7} />
-        </mesh>
-        {/* Leaves - Top */}
-        <mesh position={[0, 1.8, 0]} castShadow>
-            <coneGeometry args={[0.8, 1.2, 8]} />
-            <meshStandardMaterial color="#4ade80" roughness={0.7} />
-        </mesh>
-    </group>
-);
+const Tree = ({ position, scale = 1, color1, color2, type }: { position: [number, number, number], scale?: number, color1: string, color2: string, type: TreeType }) => {
+    return (
+        <group position={position} scale={scale}>
+            {/* Trunk */}
+            {type !== 'crystal' && (
+                <mesh position={[0, 0.5, 0]} castShadow>
+                    <cylinderGeometry args={[0.2, 0.3, 1]} />
+                    <meshStandardMaterial color={type === 'bare' ? "#292524" : "#5c4033"} roughness={0.9} />
+                </mesh>
+            )}
 
-const Bank = ({ position, color, side }: { position: [number, number, number], color: string, side: 'left' | 'right' }) => {
+            {type === 'pine' && (
+                <>
+                    {/* Leaves - Bottom */}
+                    <mesh position={[0, 1.2, 0]} castShadow>
+                        <coneGeometry args={[1, 1.5, 8]} />
+                        <meshStandardMaterial color={color1} roughness={0.7} />
+                    </mesh>
+                    {/* Leaves - Top */}
+                    <mesh position={[0, 1.8, 0]} castShadow>
+                        <coneGeometry args={[0.8, 1.2, 8]} />
+                        <meshStandardMaterial color={color2} roughness={0.7} />
+                    </mesh>
+                </>
+            )}
+
+            {type === 'round' && (
+                <>
+                    <mesh position={[0, 1.5, 0]} castShadow>
+                        <sphereGeometry args={[1.2, 16, 16]} />
+                        <meshStandardMaterial color={color1} roughness={0.8} />
+                    </mesh>
+                    <mesh position={[0.5, 1.8, 0.5]} castShadow scale={0.6}>
+                        <sphereGeometry args={[1, 16, 16]} />
+                        <meshStandardMaterial color={color2} roughness={0.8} />
+                    </mesh>
+                    <mesh position={[-0.5, 1.6, -0.4]} castShadow scale={0.7}>
+                        <sphereGeometry args={[1, 16, 16]} />
+                        <meshStandardMaterial color={color2} roughness={0.8} />
+                    </mesh>
+                </>
+            )}
+
+            {type === 'bare' && (
+                <>
+                    <mesh position={[0.3, 1.2, 0.2]} rotation={[0, 0, -0.5]} castShadow>
+                        <cylinderGeometry args={[0.05, 0.1, 1]} />
+                        <meshStandardMaterial color="#292524" roughness={0.9} />
+                    </mesh>
+                    <mesh position={[-0.3, 1.4, -0.1]} rotation={[0.2, 0, 0.6]} castShadow>
+                        <cylinderGeometry args={[0.04, 0.08, 0.8]} />
+                        <meshStandardMaterial color="#292524" roughness={0.9} />
+                    </mesh>
+                </>
+            )}
+
+            {type === 'crystal' && (
+                <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+                    <mesh position={[0, 1.5, 0]} castShadow>
+                        <octahedronGeometry args={[1, 0]} />
+                        <meshStandardMaterial color={color1} roughness={0.2} metalness={0.8} emissive={color1} emissiveIntensity={0.2} />
+                    </mesh>
+                    <mesh position={[0, 0.5, 0]} castShadow scale={0.5}>
+                        <octahedronGeometry args={[1, 0]} />
+                        <meshStandardMaterial color={color2} roughness={0.2} metalness={0.8} emissive={color2} emissiveIntensity={0.4} />
+                    </mesh>
+                </Float>
+            )}
+        </group>
+    );
+};
+
+const Bank = ({ position, color, side, tree1, tree2, treeType }: { position: [number, number, number], color: string, side: 'left' | 'right', tree1: string, tree2: string, treeType: TreeType }) => {
     const depth = 500;
     const width = 250;
     const meshX = side === 'left' ? 5 - width / 2 : -5 + width / 2;
@@ -64,18 +132,18 @@ const Bank = ({ position, color, side }: { position: [number, number, number], c
             </mesh>
 
             {/* Add some random trees */}
-            <Tree position={[side === 'left' ? 2 : -2, 0.5, -5]} scale={1.2} />
-            <Tree position={[side === 'left' ? 0 : 0, 0.5, -2]} scale={0.8} />
-            <Tree position={[side === 'left' ? 3 : -3, 0.5, 4]} scale={1.5} />
-            <Tree position={[side === 'left' ? 1 : -1, 0.5, 8]} scale={1.1} />
+            <Tree position={[side === 'left' ? 2 : -2, 0.5, -5]} scale={1.2} color1={tree1} color2={tree2} type={treeType} />
+            <Tree position={[side === 'left' ? 0 : 0, 0.5, -2]} scale={0.8} color1={tree1} color2={tree2} type={treeType} />
+            <Tree position={[side === 'left' ? 3 : -3, 0.5, 4]} scale={1.5} color1={tree1} color2={tree2} type={treeType} />
+            <Tree position={[side === 'left' ? 1 : -1, 0.5, 8]} scale={1.1} color1={tree1} color2={tree2} type={treeType} />
 
             {/* Additional background trees */}
-            <Tree position={[side === 'left' ? 5 : -5, 0.5, -15]} scale={1.6} />
-            <Tree position={[side === 'left' ? 2 : -2, 0.5, -25]} scale={1.3} />
-            <Tree position={[side === 'left' ? 8 : -8, 0.5, 15]} scale={1.8} />
-            <Tree position={[side === 'left' ? 4 : -4, 0.5, 30]} scale={1.4} />
-            <Tree position={[side === 'left' ? -5 : 5, 0.5, 40]} scale={1.5} />
-            <Tree position={[side === 'left' ? 2 : -2, 0.5, 50]} scale={1.2} />
+            <Tree position={[side === 'left' ? 5 : -5, 0.5, -15]} scale={1.6} color1={tree1} color2={tree2} type={treeType} />
+            <Tree position={[side === 'left' ? 2 : -2, 0.5, -25]} scale={1.3} color1={tree1} color2={tree2} type={treeType} />
+            <Tree position={[side === 'left' ? 8 : -8, 0.5, 15]} scale={1.8} color1={tree1} color2={tree2} type={treeType} />
+            <Tree position={[side === 'left' ? 4 : -4, 0.5, 30]} scale={1.4} color1={tree1} color2={tree2} type={treeType} />
+            <Tree position={[side === 'left' ? -5 : 5, 0.5, 40]} scale={1.5} color1={tree1} color2={tree2} type={treeType} />
+            <Tree position={[side === 'left' ? 2 : -2, 0.5, 50]} scale={1.2} color1={tree1} color2={tree2} type={treeType} />
         </group>
     );
 };
@@ -138,17 +206,20 @@ const Character3D = ({ position, sprite, name, isPlaying }: { position: [number,
 
 const Scene = () => {
     const { state } = useGame();
-    const { stones, targetPosition, currentPosition, character, gameStatus } = state;
+    const { stones, targetPosition, currentPosition, character, gameStatus, level } = state;
+
+    const themeIndex = (level - 1) % themes.length;
+    const theme = themes[themeIndex];
 
     // Map Game Coordinates (0-100) to 3D Space (-10 to 10 on X axis)
     const mapPosition = (p: number) => -10 + (p / targetPosition) * 20;
 
     return (
         <>
-            <color attach="background" args={['#0f172a']} />
+            <color attach="background" args={[theme.background]} />
 
             {/* Magical Sky & Environment */}
-            <Sky sunPosition={[10, -2, -10]} turbidity={10} rayleigh={2} mieCoefficient={0.005} mieDirectionalG={0.8} />
+            <Sky sunPosition={[10, -2, -10]} turbidity={10} rayleigh={theme.rayleigh} mieCoefficient={0.005} mieDirectionalG={0.8} />
             <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
 
             {/* Lighting */}
@@ -166,18 +237,22 @@ const Scene = () => {
             />
             <pointLight position={[-10, 10, -10]} intensity={1} color="#a855f7" />
 
-            {/* Fireflies / Magic Sparkles */}
-            <Sparkles count={150} scale={25} size={6} speed={0.4} opacity={0.6} color="#fde047" position={[0, 2, 0]} />
+            {/* Particles / Weather effects */}
+            {theme.particleType === 'leaves' && <Sparkles count={150} scale={40} size={8} speed={0.8} opacity={0.8} color="#ea580c" position={[0, 5, 0]} />}
+            {theme.particleType === 'snow' && <Sparkles count={400} scale={50} size={5} speed={0.5} opacity={0.6} color="#ffffff" position={[0, 10, 0]} />}
+            {theme.particleType === 'embers' && <Sparkles count={200} scale={30} size={7} speed={1.5} opacity={0.9} color="#ef4444" position={[0, 2, 0]} />}
+            {theme.particleType === 'magic' && <Sparkles count={200} scale={35} size={10} speed={0.3} opacity={0.6} color="#ec4899" position={[0, 5, 0]} />}
+            {theme.particleType === 'fireflies' && <Sparkles count={150} scale={25} size={6} speed={0.4} opacity={0.6} color="#fde047" position={[0, 2, 0]} />}
 
             {/* Environment for nice reflections */}
             <Environment preset="night" />
 
             {/* River */}
-            <River />
+            <River waterColor={theme.water} emissiveColor={theme.waterEmissive} />
 
             {/* Starting and Ending Banks */}
-            <Bank position={[-15, -0.5, 0]} color="#166534" side="left" />
-            <Bank position={[15, -0.5, 0]} color="#166534" side="right" />
+            <Bank position={[-15, -0.5, 0]} color={theme.bank} side="left" tree1={theme.tree1} tree2={theme.tree2} treeType={theme.treeType} />
+            <Bank position={[15, -0.5, 0]} color={theme.bank} side="right" tree1={theme.tree1} tree2={theme.tree2} treeType={theme.treeType} />
 
             {/* Stepping Stones */}
             {stones.map((stone) => {
