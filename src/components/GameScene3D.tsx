@@ -7,7 +7,9 @@ import { useGame } from '../context/GameContext';
 type TreeType = 'pine' | 'round' | 'bare' | 'crystal';
 type ParticleType = 'fireflies' | 'leaves' | 'snow' | 'embers' | 'magic';
 
-const themes: { water: string, waterEmissive: string, bank: string, tree1: string, tree2: string, rayleigh: number, background: string, treeType: TreeType, particleType: ParticleType }[] = [
+interface ThemeDef { water: string, waterEmissive: string, bank: string, tree1: string, tree2: string, rayleigh: number, background: string, treeType: TreeType, particleType: ParticleType }
+
+const initialThemes: ThemeDef[] = [
     // Level 1: Summer/Grass
     { water: "#0ea5e9", waterEmissive: "#0284c7", bank: "#166534", tree1: "#22c55e", tree2: "#4ade80", rayleigh: 2, background: '#0f172a', treeType: 'pine', particleType: 'fireflies' },
     // Level 2: Autumn
@@ -19,6 +21,53 @@ const themes: { water: string, waterEmissive: string, bank: string, tree1: strin
     // Level 5: Magic
     { water: "#ec4899", waterEmissive: "#db2777", bank: "#312e81", tree1: "#8b5cf6", tree2: "#d946ef", rayleigh: 3, background: '#172554', treeType: 'crystal', particleType: 'magic' },
 ];
+
+const themeComponents = {
+    waters: [
+        { water: "#0ea5e9", waterEmissive: "#0284c7" },
+        { water: "#a855f7", waterEmissive: "#9333ea" },
+        { water: "#38bdf8", waterEmissive: "#0284c7" },
+        { water: "#ef4444", waterEmissive: "#dc2626" },
+        { water: "#ec4899", waterEmissive: "#db2777" },
+        { water: "#22c55e", waterEmissive: "#16a34a" },
+        { water: "#f59e0b", waterEmissive: "#d97706" }
+    ],
+    banks: ["#166534", "#92400e", "#e2e8f0", "#292524", "#312e81", "#1e3a8a", "#064e3b"],
+    trees: [
+        { tree1: "#22c55e", tree2: "#4ade80" },
+        { tree1: "#ea580c", tree2: "#f59e0b" },
+        { tree1: "#94a3b8", tree2: "#cbd5e1" },
+        { tree1: "#57534e", tree2: "#78716c" },
+        { tree1: "#8b5cf6", tree2: "#d946ef" },
+        { tree1: "#14b8a6", tree2: "#2dd4bf" },
+        { tree1: "#f43f5e", tree2: "#fb7185" }
+    ],
+    backgrounds: ['#0f172a', '#1e1b4b', '#450a0a', '#172554', '#022c22', '#2e1065', '#000000'],
+    treeTypes: ['pine', 'round', 'bare', 'crystal'] as TreeType[],
+    particleTypes: ['fireflies', 'leaves', 'snow', 'embers', 'magic'] as ParticleType[]
+};
+
+const getThemeForLevel = (level: number): ThemeDef => {
+    if (level <= 5) return initialThemes[level - 1];
+
+    // Procedural generation using a seed based on level so it's consistent for that level
+    const pseudoRandom = (seed: number) => {
+        let x = Math.sin(seed * 9999) * 10000;
+        return x - Math.floor(x);
+    };
+
+    const s = level * 1337;
+
+    return {
+        ...themeComponents.waters[Math.floor(pseudoRandom(s) * themeComponents.waters.length)],
+        bank: themeComponents.banks[Math.floor(pseudoRandom(s + 1) * themeComponents.banks.length)],
+        ...themeComponents.trees[Math.floor(pseudoRandom(s + 2) * themeComponents.trees.length)],
+        rayleigh: 0.5 + pseudoRandom(s + 3) * 7.5,
+        background: themeComponents.backgrounds[Math.floor(pseudoRandom(s + 4) * themeComponents.backgrounds.length)],
+        treeType: themeComponents.treeTypes[Math.floor(pseudoRandom(s + 5) * themeComponents.treeTypes.length)],
+        particleType: themeComponents.particleTypes[Math.floor(pseudoRandom(s + 6) * themeComponents.particleTypes.length)]
+    };
+};
 
 const River = ({ waterColor, emissiveColor }: { waterColor: string, emissiveColor: string }) => {
     const meshRef = useRef<THREE.Mesh>(null);
@@ -208,8 +257,7 @@ const Scene = () => {
     const { state } = useGame();
     const { stones, targetPosition, currentPosition, character, gameStatus, level } = state;
 
-    const themeIndex = (level - 1) % themes.length;
-    const theme = themes[themeIndex];
+    const theme = getThemeForLevel(level);
 
     // Map Game Coordinates (0-100) to 3D Space (-10 to 10 on X axis)
     const mapPosition = (p: number) => -10 + (p / targetPosition) * 20;
