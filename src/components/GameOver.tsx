@@ -3,10 +3,14 @@ import { RotateCcw, Menu, Trophy, Frown } from 'lucide-react';
 
 const GameOver = () => {
   const { state, dispatch } = useGame();
-  const { gameStatus, score, words } = state;
+  const { gameStatus, score, words, stars } = state;
 
   const handlePlayAgain = () => {
     dispatch({ type: 'RESET_GAME' });
+  };
+
+  const handleNextLevel = () => {
+    dispatch({ type: 'NEXT_LEVEL' });
   };
 
   const handleSwitchMode = () => {
@@ -59,13 +63,15 @@ const GameOver = () => {
       <div className="p-4 md:p-6 bg-sky-50 flex flex-col items-center">
         <div className="grid grid-cols-2 gap-4 mb-4 md:mb-6 w-full">
           <div className="bg-yellow-400 border-b-4 border-yellow-600 p-2 md:p-3 rounded-2xl text-center shadow-md">
-            <div className="text-[10px] md:text-sm font-black text-yellow-900 uppercase tracking-widest bg-white/40 rounded-full inline-block px-2 py-0.5 mb-1">Final Score</div>
+            <div className="text-[10px] md:text-sm font-black text-yellow-900 uppercase tracking-widest bg-white/40 rounded-full inline-block px-2 py-0.5 mb-1">Score</div>
             <div className="text-3xl md:text-4xl font-black text-white drop-shadow-md">{score}</div>
           </div>
 
-          <div className="bg-sky-400 border-b-4 border-sky-600 p-2 md:p-3 rounded-2xl text-center shadow-md">
-            <div className="text-[10px] md:text-sm font-black text-sky-900 uppercase tracking-widest bg-white/40 rounded-full inline-block px-2 py-0.5 mb-1">Words Used</div>
-            <div className="text-3xl md:text-4xl font-black text-white drop-shadow-md">{words.length}</div>
+          <div className="bg-amber-400 border-b-4 border-amber-600 p-2 md:p-3 rounded-2xl text-center shadow-md flex flex-col items-center">
+            <div className="text-[10px] md:text-sm font-black text-amber-900 uppercase tracking-widest bg-white/40 rounded-full inline-block px-2 py-0.5 mb-1">Stars</div>
+            <div className="text-3xl md:text-4xl font-black text-white drop-shadow-md flex items-center justify-center">
+              {stars} <span className="text-2xl ml-1">🌟</span>
+            </div>
           </div>
         </div>
 
@@ -92,13 +98,22 @@ const GameOver = () => {
 
         {/* Buttons */}
         <div className="flex flex-col space-y-3 w-full">
-          <button
-            onClick={handlePlayAgain}
-            className="bg-gradient-to-b from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white py-3 px-4 rounded-2xl font-black text-lg transition-all transform hover:scale-105 active:scale-95 shadow-[0_4px_0_rgb(37,99,235)] flex items-center justify-center border-2 border-blue-300"
-          >
-            <RotateCcw className="w-5 h-5 mr-2 stroke-[3]" />
-            PLAY AGAIN!
-          </button>
+          {isWin ? (
+            <button
+              onClick={handleNextLevel}
+              className="bg-gradient-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white py-3 px-4 rounded-2xl font-black text-lg transition-all transform hover:scale-105 active:scale-95 shadow-[0_4px_0_rgb(21,128,61)] flex items-center justify-center border-2 border-green-300"
+            >
+              NEXT LEVEL! 🌟
+            </button>
+          ) : (
+            <button
+              onClick={handlePlayAgain}
+              className="bg-gradient-to-b from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white py-3 px-4 rounded-2xl font-black text-lg transition-all transform hover:scale-105 active:scale-95 shadow-[0_4px_0_rgb(37,99,235)] flex items-center justify-center border-2 border-blue-300"
+            >
+              <RotateCcw className="w-5 h-5 mr-2 stroke-[3]" />
+              PLAY AGAIN!
+            </button>
+          )}
 
           <button
             onClick={handleSwitchMode}

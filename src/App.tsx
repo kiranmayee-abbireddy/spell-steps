@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { GameProvider } from './context/GameContext';
 import GameScreen from './components/GameScreen';
 import TitleScreen from './components/TitleScreen';
@@ -7,10 +7,12 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-gradient-to-b from-sky-300 to-blue-500 flex items-center justify-center p-4">
+    <div className="h-[100dvh] w-screen overflow-hidden bg-gradient-to-b from-sky-300 to-blue-500 flex items-center justify-center">
       <GameProvider>
         {!gameStarted ? (
-          <TitleScreen onStartGame={() => setGameStarted(true)} />
+          <div className="p-4 w-full h-full flex items-center justify-center">
+            <TitleScreen onStartGame={() => setGameStarted(true)} />
+          </div>
         ) : (
           <GameScreen />
         )}

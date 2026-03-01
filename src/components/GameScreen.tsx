@@ -58,7 +58,7 @@ const GameScreen = () => {
   }, [state.currentPosition, state.gameStatus, state.targetPosition, dispatch]);
 
   return (
-    <div className="w-full h-screen relative overflow-hidden">
+    <div className="w-full h-full relative overflow-hidden">
       <GameScene3D />
 
       <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
