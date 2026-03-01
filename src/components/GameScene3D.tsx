@@ -265,9 +265,9 @@ const Scene = () => {
     return (
         <>
             <color attach="background" args={[theme.background]} />
+            <fog attach="fog" args={[theme.background, 15, 45]} />
 
-            {/* Magical Sky & Environment */}
-            <Sky sunPosition={[10, -2, -10]} turbidity={10} rayleigh={theme.rayleigh} mieCoefficient={0.005} mieDirectionalG={0.8} />
+            {/* Magical Environment */}
             <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
 
             {/* Lighting */}
