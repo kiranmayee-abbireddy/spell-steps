@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { formatTime } from '../utils/gameUtils';
 import { longWords } from '../data/dictionary';
@@ -9,24 +10,32 @@ const GameStatus = () => {
   const { state, dispatch } = useGame();
   const { score, timeRemaining, gameMode, words, level, stars, diamonds, usedRandomWords } = state;
 
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
   const handleDiamondClick = () => {
     if (diamonds <= 0 || state.gameStatus !== 'playing') return;
+    setShowConfirmModal(true);
+  };
 
-    if (window.confirm("Spend 1 Gem to get a random long word?")) {
-      // Find words that haven't been used yet in the whole game, and not in current level
-      const currentLevelWords = state.words.map(w => w.word);
-      const availableWords = longWords.filter(
-        w => !(usedRandomWords || []).includes(w) && !currentLevelWords.includes(w)
-      );
+  const confirmSpendDiamond = () => {
+    setShowConfirmModal(false);
+    // Find words that haven't been used yet in the whole game, and not in current level
+    const currentLevelWords = state.words.map(w => w.word);
+    const availableWords = longWords.filter(
+      w => !(usedRandomWords || []).includes(w) && !currentLevelWords.includes(w)
+    );
 
-      let selectedWord = "supercalifragilisticexpialidocious"; // fallback
-      if (availableWords.length > 0) {
-        selectedWord = availableWords[Math.floor(Math.random() * availableWords.length)];
-      }
-
-      dispatch({ type: 'USE_DIAMOND', payload: selectedWord });
-      playSound('special');
+    let selectedWord = "supercalifragilisticexpialidocious"; // fallback
+    if (availableWords.length > 0) {
+      selectedWord = availableWords[Math.floor(Math.random() * availableWords.length)];
     }
+
+    dispatch({ type: 'USE_DIAMOND', payload: selectedWord });
+    playSound('special');
+  };
+
+  const cancelSpendDiamond = () => {
+    setShowConfirmModal(false);
   };
 
   return (
@@ -109,6 +118,35 @@ const GameStatus = () => {
                 {word.word} <span className="opacity-70 ml-1">+{word.points}</span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-sm pointer-events-auto flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full text-center shadow-2xl border-4 border-fuchsia-400 transform transition-all animate-bounce-in">
+            <div className="flex justify-center mb-4">
+              <Gem className="w-16 h-16 text-fuchsia-500 animate-pulse drop-shadow-md" />
+            </div>
+            <h2 className="text-2xl font-black text-sky-900 mb-2">Spend 1 Gem?</h2>
+            <p className="text-gray-600 font-medium mb-6">
+              Trade a gem to instantly reveal and type a massive random word!
+            </p>
+            <div className="flex space-x-4">
+              <button
+                onClick={cancelSpendDiamond}
+                className="flex-1 py-3 px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded-2xl transition-all active:scale-95 shadow-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmSpendDiamond}
+                className="flex-1 py-3 px-4 bg-gradient-to-b from-fuchsia-400 to-fuchsia-600 hover:from-fuchsia-500 hover:to-fuchsia-700 text-white font-black rounded-2xl transition-all active:scale-95 shadow-[0_4px_0_rgb(192,38,211)] hover:shadow-[0_2px_0_rgb(192,38,211)] hover:translate-y-0.5 border-b-2 border-fuchsia-700"
+              >
+                Yes, Do it!
+              </button>
+            </div>
           </div>
         </div>
       )}
