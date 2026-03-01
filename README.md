@@ -10,11 +10,16 @@ Welcome to **Spell Steps**! A magical word-typing and bridge-building game where
 
 ## Features ✨
 
-* **Typing Challenge:** Type words quickly and correctly to build solid stepping stones and help the character cross the river!
-* **Dictionary API Support:** Comprehensive dictionary fallback validating and checking meanings.
-* **Progressive Difficulty:** Experience harder words and faster challenges as your level increases.
-* **Special Words & Gems:** Some words are enchanted, unlocking special stones and magical gems.
-* **Sound & Animation Effects:** Engaging particle effects and lovely sound scapes that draw you in.
+* **Two Game Modes:** Play at your own pace in **Casual** mode or race against the clock in **Timed** mode!
+* **Typing Challenge:** Type words quickly and correctly to build solid stepping stones and help the character cross the river. The bigger the word you type, the wider the stone will be!
+* **Progressive Difficulty:** As you level up, the river gets wider, meaning you'll need to type more words to safely cross it.
+* **Rewards & Magic:**
+  * Type 5 long words (more than 7 letters) to earn a **Diamond**.
+  * Type 15 regular words to earn a **Gem**.
+  * Use a Gem to instantly cast magic and generate a long word!
+* **Interactive Dictionary:** Click on any word stone you've built to see its definition, synonyms, and antonyms.
+* **Unlockable Characters:** Keep crossing rivers! A new character is unlocked every 5 levels.
+* **Sound & Animation Effects:** Engaging particle effects and lovely soundscapes that draw you in.
 * **Cross-Platform:** Available as an immersive web application and a native Android application out of the box!
 
 ## Getting Started 🚀
