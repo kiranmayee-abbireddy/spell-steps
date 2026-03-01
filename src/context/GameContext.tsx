@@ -32,8 +32,8 @@ interface GameState {
   suggestedWord: string | null;
 }
 
-// Initial game state
-const initialState: GameState = {
+// Initial game state (base)
+export const initialState: GameState = {
   stones: [],
   character: getRandomCharacter(characters),
   score: 0,
@@ -55,11 +55,22 @@ const initialState: GameState = {
   suggestedWord: null
 };
 
+export interface RootState {
+  activeMode: GameMode;
+  casual: GameState;
+  timed: GameState;
+}
+
+export const initialRootState: RootState = {
+  activeMode: 'casual',
+  casual: { ...initialState, gameMode: 'casual', timeRemaining: Infinity },
+  timed: { ...initialState, gameMode: 'timed', timeRemaining: 60 }
+};
+
 // Define action types
-type GameAction =
+export type GameAction =
   | { type: 'ADD_STONE'; payload: Stone }
   | { type: 'MOVE_CHARACTER'; payload: number }
-  | { type: 'SET_GAME_MODE'; payload: GameMode }
   | { type: 'SET_GAME_STATUS'; payload: GameStatus }
   | { type: 'ADD_WORD'; payload: WordHistory }
   | { type: 'UPDATE_TIME'; payload: number }
@@ -71,7 +82,11 @@ type GameAction =
   | { type: 'USE_DIAMOND'; payload: string }
   | { type: 'CLEAR_SUGGESTED_WORD' };
 
-// Create reducer function
+export type RootAction =
+  | GameAction
+  | { type: 'SET_ACTIVE_MODE'; payload: GameMode };
+
+// Create reducer function for individual game state
 function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case 'ADD_STONE':
@@ -87,12 +102,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           action.payload >= state.targetPosition
             ? state.score + (state.gameMode === 'timed' ? Math.floor(state.timeRemaining * 10) : 0)
             : state.score
-      };
-    case 'SET_GAME_MODE':
-      return {
-        ...state,
-        gameMode: action.payload,
-        timeRemaining: action.payload === 'timed' ? 60 : Infinity
       };
     case 'SET_GAME_STATUS':
       return {
@@ -198,7 +207,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         highScore: state.highScore,
         character: getRandomCharacter(characters),
         gameMode: state.gameMode,
-        // In case gameMode was timed, reset time properly based on initial level 1
         timeRemaining: state.gameMode === 'timed' ? 60 : Infinity
       };
     default:
@@ -206,37 +214,76 @@ function gameReducer(state: GameState, action: GameAction): GameState {
   }
 }
 
+// Create root reducer that directs actions to the active mode
+function rootReducer(root: RootState, action: RootAction): RootState {
+  if (action.type === 'SET_ACTIVE_MODE') {
+    return {
+      ...root,
+      activeMode: action.payload
+    };
+  }
+
+  // All other actions operate on the ACTIVE game mode state
+  const currentMode = root.activeMode;
+  const gameAction = action as GameAction;
+
+  const newGameState = gameReducer(root[currentMode], gameAction);
+
+  return {
+    ...root,
+    [currentMode]: newGameState
+  };
+}
+
 // Create context
 interface GameContextType {
-  state: GameState;
-  dispatch: Dispatch<GameAction>;
+  state: GameState; // exposes the currently active game state
+  rootState: RootState; // exposes the raw multi-save structure
+  dispatch: Dispatch<RootAction>;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 // Provider component
-function init(defaultState: GameState): GameState {
+function init(defaultState: RootState): RootState {
   try {
-    const saved = localStorage.getItem('spellStepsGameState');
+    const saved = localStorage.getItem('spellStepsRootState');
     if (saved) {
       const parsed = JSON.parse(saved);
       return { ...defaultState, ...parsed };
     }
   } catch (e) {
-    console.error('Failed to parse saved game state', e);
+    console.error('Failed to parse saved root state', e);
   }
+
+  // Legacy migration (if they only had 'spellStepsGameState')
+  try {
+    const savedLegacy = localStorage.getItem('spellStepsGameState');
+    if (savedLegacy) {
+      const parsed = JSON.parse(savedLegacy);
+      const mode = parsed.gameMode || 'casual';
+      return {
+        ...defaultState,
+        activeMode: mode,
+        [mode]: { ...initialState, ...parsed }
+      };
+    }
+  } catch (e) { }
+
   return defaultState;
 }
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(gameReducer, initialState, init);
+  const [rootState, dispatch] = useReducer(rootReducer, initialRootState, init);
 
   useEffect(() => {
-    localStorage.setItem('spellStepsGameState', JSON.stringify(state));
-  }, [state]);
+    localStorage.setItem('spellStepsRootState', JSON.stringify(rootState));
+  }, [rootState]);
+
+  const activeGameState = rootState[rootState.activeMode];
 
   return (
-    <GameContext.Provider value={{ state, dispatch }}>
+    <GameContext.Provider value={{ state: activeGameState, rootState, dispatch }}>
       {children}
     </GameContext.Provider>
   );

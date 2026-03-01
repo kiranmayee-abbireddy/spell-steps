@@ -15,10 +15,9 @@ const GameOver = () => {
 
   const handleSwitchMode = () => {
     dispatch({
-      type: 'SET_GAME_MODE',
+      type: 'SET_ACTIVE_MODE',
       payload: state.gameMode === 'casual' ? 'timed' : 'casual'
     });
-    dispatch({ type: 'RESET_GAME' });
   };
 
   const isWin = gameStatus === 'won';

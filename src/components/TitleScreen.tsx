@@ -7,20 +7,25 @@ interface TitleScreenProps {
 }
 
 const TitleScreen = ({ onStartGame }: TitleScreenProps) => {
-  const { state, dispatch } = useGame();
+  const { rootState, dispatch } = useGame();
   const [showInstructions, setShowInstructions] = useState(false);
 
   const handleSetGameMode = (mode: 'casual' | 'timed') => {
+    dispatch({ type: 'SET_ACTIVE_MODE', payload: mode });
     dispatch({ type: 'RESET_GAME' });
-    dispatch({ type: 'SET_GAME_MODE', payload: mode });
     onStartGame();
   };
 
-  const handleContinue = () => {
+  const handleContinue = (mode: 'casual' | 'timed') => {
+    dispatch({ type: 'SET_ACTIVE_MODE', payload: mode });
     onStartGame();
   };
 
-  const hasSavedGame = state.score > 0 || state.level > 1 || state.gameStatus === 'playing' || state.gameStatus === 'won';
+  const casualState = rootState.casual;
+  const timedState = rootState.timed;
+
+  const hasCasualSave = casualState.score > 0 || casualState.level > 1 || casualState.gameStatus === 'playing' || casualState.gameStatus === 'won';
+  const hasTimedSave = timedState.score > 0 || timedState.level > 1 || timedState.gameStatus === 'playing' || timedState.gameStatus === 'won';
 
   return (
     <div className="w-full max-w-2xl max-h-[95vh] bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden transform transition-all border-4 border-blue-300 flex flex-col">
@@ -38,11 +43,11 @@ const TitleScreen = ({ onStartGame }: TitleScreenProps) => {
           Magic Words, Magic Steps! ✨
         </p>
 
-        {state.highScore > 0 && (
+        {rootState[rootState.activeMode].highScore > 0 && (
           <div className="absolute top-2 right-2 z-20 bg-yellow-400 border-b-4 border-yellow-600 px-2 py-1 md:px-4 md:py-2 rounded-xl md:rounded-2xl shadow-lg transform rotate-3">
             <div className="hidden md:inline-block text-[8px] font-black text-yellow-900 uppercase tracking-widest bg-white/40 rounded-full px-2 py-0.5 mb-1">High Score</div>
             <div className="text-sm md:text-2xl font-black text-white drop-shadow-md flex items-center">
-              <span className="mr-1">🏆</span> {state.highScore}
+              <span className="mr-1">🏆</span> {rootState[rootState.activeMode].highScore}
             </div>
           </div>
         )}
@@ -91,16 +96,29 @@ const TitleScreen = ({ onStartGame }: TitleScreenProps) => {
               CHOOSE YOUR ADVENTURE!
             </h2>
 
-            {hasSavedGame && (
-              <button
-                onClick={handleContinue}
-                className="w-full mb-4 md:mb-6 group relative bg-gradient-to-b from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white p-4 md:p-6 rounded-2xl transition-all transform hover:scale-[1.02] active:scale-95 shadow-[0_8px_0_rgb(37,99,235)] hover:shadow-[0_4px_0_rgb(37,99,235)] hover:translate-y-1"
-              >
-                <div className="absolute top-0 right-0 p-2 md:p-4 opacity-50 text-2xl md:text-4xl group-hover:scale-125 transition-transform duration-300">🗺️</div>
-                <div className="font-extrabold text-xl md:text-2xl mb-1 shadow-black/20 drop-shadow-md text-left">Continue Journey</div>
-                <div className="text-blue-100 text-xs md:text-sm font-medium text-left">Level {state.level} • Score {state.score}</div>
-              </button>
-            )}
+            <div className="space-y-4 mb-4 md:mb-6">
+              {hasCasualSave && (
+                <button
+                  onClick={() => handleContinue('casual')}
+                  className="w-full group relative bg-gradient-to-b from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white p-4 md:p-6 rounded-2xl transition-all transform hover:scale-[1.02] active:scale-95 shadow-[0_8px_0_rgb(37,99,235)] hover:shadow-[0_4px_0_rgb(37,99,235)] hover:translate-y-1"
+                >
+                  <div className="absolute top-0 right-0 p-2 md:p-4 opacity-50 text-2xl md:text-4xl group-hover:scale-125 transition-transform duration-300">🗺️</div>
+                  <div className="font-extrabold text-xl md:text-2xl mb-1 shadow-black/20 drop-shadow-md text-left">Continue Casual</div>
+                  <div className="text-blue-100 text-xs md:text-sm font-medium text-left">Level {casualState.level} • Score {casualState.score}</div>
+                </button>
+              )}
+
+              {hasTimedSave && (
+                <button
+                  onClick={() => handleContinue('timed')}
+                  className="w-full group relative bg-gradient-to-b from-indigo-500 to-indigo-700 hover:from-indigo-600 hover:to-indigo-800 text-white p-4 md:p-6 rounded-2xl transition-all transform hover:scale-[1.02] active:scale-95 shadow-[0_8px_0_rgb(67,56,202)] hover:shadow-[0_4px_0_rgb(67,56,202)] hover:translate-y-1"
+                >
+                  <div className="absolute top-0 right-0 p-2 md:p-4 opacity-50 text-2xl md:text-4xl group-hover:scale-125 transition-transform duration-300">⏳</div>
+                  <div className="font-extrabold text-xl md:text-2xl mb-1 shadow-black/20 drop-shadow-md text-left">Continue Time Sprint</div>
+                  <div className="text-indigo-200 text-xs md:text-sm font-medium text-left">Level {timedState.level} • Score {timedState.score}</div>
+                </button>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-8">
               <button
