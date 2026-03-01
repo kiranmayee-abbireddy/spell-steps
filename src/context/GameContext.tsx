@@ -27,6 +27,8 @@ interface GameState {
   highScore: number;
   totalLongWords: number;
   diamonds: number;
+  usedRandomWords: string[];
+  suggestedWord: string | null;
 }
 
 // Initial game state
@@ -46,7 +48,9 @@ const initialState: GameState = {
   stars: 0,
   highScore: 0,
   totalLongWords: 0,
-  diamonds: 0
+  diamonds: 0,
+  usedRandomWords: [],
+  suggestedWord: null
 };
 
 // Define action types
@@ -61,7 +65,9 @@ type GameAction =
   | { type: 'SET_WORD_VALIDITY'; payload: boolean }
   | { type: 'SET_MESSAGE'; payload: string }
   | { type: 'NEXT_LEVEL' }
-  | { type: 'RESET_GAME' };
+  | { type: 'RESET_GAME' }
+  | { type: 'USE_DIAMOND'; payload: string }
+  | { type: 'CLEAR_SUGGESTED_WORD' };
 
 // Create reducer function
 function gameReducer(state: GameState, action: GameAction): GameState {
@@ -157,6 +163,20 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         timeRemaining: state.gameMode === 'timed' ? 60 + (state.level * 10) : Infinity
       };
     }
+    case 'USE_DIAMOND':
+      return {
+        ...state,
+        diamonds: Math.max(0, state.diamonds - 1),
+        usedRandomWords: [...(state.usedRandomWords || []), action.payload],
+        message: `💎 Gem activated! Here is your magic word!`,
+        suggestedWord: action.payload,
+        lastWordValid: true
+      };
+    case 'CLEAR_SUGGESTED_WORD':
+      return {
+        ...state,
+        suggestedWord: null
+      };
     case 'RESET_GAME':
       return {
         ...initialState,

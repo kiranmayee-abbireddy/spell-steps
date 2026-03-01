@@ -17,6 +17,14 @@ const WordInput = () => {
     }
   }, []);
 
+  // Listen for suggested word from Gem
+  useEffect(() => {
+    if (state.suggestedWord) {
+      setInputWord(state.suggestedWord);
+      dispatch({ type: 'CLEAR_SUGGESTED_WORD' });
+    }
+  }, [state.suggestedWord, dispatch]);
+
   // Handle form submission
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

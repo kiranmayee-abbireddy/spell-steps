@@ -32,3 +32,26 @@ export const wordList = [
   "famous", "far", "farm", "father", "fast", "fat", "fault", "fear", "feed", "feel",
   "female", "fever", "few", "fight", "fill", "film", "find", "fine", "finger", "finish"
 ];
+
+// Curated list of long words (8+ letters) for the Gem feature
+export const longWords = [
+  "absolute", "abstract", "academic", "accepted", "accident", "accuracy", "accurate", "achieved",
+  "acquired", "activity", "actually", "addition", "adequate", "adjacent", "adjusted", "advanced",
+  "advisory", "advocate", "affected", "aircraft", "alliance", "although", "aluminum", "analysis",
+  "announce", "anything", "anywhere", "apparent", "approach", "approval", "argument", "artistic",
+  "assembly", "assessed", "assigned", "assuming", "attached", "attitude", "attorney", "audience",
+  "autonomy", "boundary", "building", "business", "calendar", "campaign", "capacity", "category",
+  "cellular", "ceremony", "chairman", "champion", "chemical", "circular", "civilian", "clearing",
+  "clinical", "clothing", "collapse", "colonial", "colorful", "commerce", "composed", "compound",
+  "computer", "conclude", "concrete", "conflict", "congress", "consider", "constant", "consumer",
+  "continue", "contract", "contrary", "contrast", "convince", "corridor", "coverage", "creation",
+  "creature", "criminal", "critical", "cultural", "currency", "customer", "database", "daughter",
+  "daylight", "deadline", "deciding", "decision", "decrease", "deferred", "definite", "delegate",
+  "delivery", "describe", "designer", "detailed", "diabetes", "dialogue", "diameter", "directly",
+  "director", "disabled", "disaster", "disclose", "discount", "discover", "disorder", "disposal",
+  "distance", "distinct", "district", "dividend", "division", "doctrine", "document", "domestic",
+  "dominant", "dominate", "doubtful", "dramatic", "dressing", "dropping", "duration", "dynamics",
+  "earnings", "economic", "educated", "efficacy", "eighteen", "election", "electric", "eligible",
+  "emerging", "emphasis", "employee", "endeavor", "engaging", "engineer", "enormous", "entirely",
+  "entrance", "envelope", "equality", "equation", "estimate", "evaluate", "everyday", "everyone"
+];
