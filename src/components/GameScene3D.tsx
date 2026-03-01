@@ -399,7 +399,7 @@ const Scene = () => {
                 minPolarAngle={Math.PI / 6}     // Prevent looking top-down
                 minAzimuthAngle={-Math.PI / 4}  // Restrict rotation left
                 maxAzimuthAngle={Math.PI / 4}   // Restrict rotation right
-                target={[mapPosition(currentPosition), -2, 0]} // Shift camera target DOWN to move scene UP
+                target={[mapPosition(currentPosition), 1.5, 0]} // Shift camera target UP to move scene DOWN
             />
         </>
     );
