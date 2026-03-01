@@ -62,17 +62,28 @@ export const fetchWordDetails = async (word: string): Promise<WordDetails | null
       });
 
       // Filter out overly simplistic definitions that just say "something that is X"
+      // or that contain the exact word itself
       const wordLower = (entry.word || word).toLowerCase();
       const goodDefs = allDefs.filter(d => {
         const dLower = d.toLowerCase();
+
+        // Filter if the definition contains the actual word being defined (eg "Something that is easy")
+        // Check for word presence with boundaries
+        const containsWordObj = new RegExp(`\\b${wordLower}\\b`, 'i').test(dLower);
+
+        // Filter overly simplistic placeholder definitions from the API
         const simplistic = [
           `that is ${wordLower}`,
           `who is ${wordLower}`,
           `being ${wordLower}`,
           `to be ${wordLower}`
         ];
-        return dLower.length > 5 && !simplistic.some(s => dLower.includes(s));
+
+        return dLower.length > 5 && !containsWordObj && !simplistic.some(s => dLower.includes(s));
       });
+
+      // For kids, prefer the shortest definition because it's usually the simplest to understand
+      goodDefs.sort((a, b) => a.length - b.length);
 
       const bestDef = goodDefs.length > 0
         ? goodDefs[0]
