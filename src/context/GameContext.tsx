@@ -25,6 +25,8 @@ interface GameState {
   level: number;
   stars: number;
   highScore: number;
+  totalLongWords: number;
+  diamonds: number;
 }
 
 // Initial game state
@@ -42,7 +44,9 @@ const initialState: GameState = {
   message: 'Type words to create stones and cross the river!',
   level: 1,
   stars: 0,
-  highScore: 0
+  highScore: 0,
+  totalLongWords: 0,
+  diamonds: 0
 };
 
 // Define action types
@@ -87,11 +91,20 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         gameStatus: action.payload
       };
-    case 'ADD_WORD':
+    case 'ADD_WORD': {
+      const isLongWord = action.payload.word.length > 7;
+      const newTotalLongWords = isLongWord ? (state.totalLongWords || 0) + 1 : (state.totalLongWords || 0);
+      const newDiamonds = (isLongWord && newTotalLongWords > 0 && newTotalLongWords % 5 === 0)
+        ? (state.diamonds || 0) + 1
+        : (state.diamonds || 0);
+
       return {
         ...state,
-        words: [...state.words, action.payload]
+        words: [...state.words, action.payload],
+        totalLongWords: newTotalLongWords,
+        diamonds: newDiamonds
       };
+    }
     case 'UPDATE_TIME':
       return {
         ...state,

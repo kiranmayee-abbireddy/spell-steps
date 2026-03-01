@@ -75,16 +75,31 @@ const WordInput = () => {
       // Move character to the new stone's position
       dispatch({ type: 'MOVE_CHARACTER', payload: stone.position });
 
+      // Calculate diamond logic for notification
+      const isLongWord = word.length > 7;
+      const currentLongWords = state.totalLongWords || 0;
+      const earnedDiamond = isLongWord && ((currentLongWords + 1) % 5 === 0);
+
       // Set success message
+      let msg = stone.special
+        ? `Amazing! "${word}" created a special stone!`
+        : `Good job! "${word}" added a stone.`;
+
+      if (earnedDiamond) {
+        msg = `💎 You earned a Gem for typing 5 long words! 💎 ` + msg;
+      }
+
       dispatch({
         type: 'SET_MESSAGE',
-        payload: stone.special
-          ? `Amazing! "${word}" created a special stone!`
-          : `Good job! "${word}" added a stone.`
+        payload: msg
       });
 
       // Play success sound
-      playSound(stone.special ? 'special' : 'success');
+      if (earnedDiamond) {
+        playSound('win');
+      } else {
+        playSound(stone.special ? 'special' : 'success');
+      }
     } else {
       // Set failure message
       dispatch({

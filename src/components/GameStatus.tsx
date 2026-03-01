@@ -1,11 +1,11 @@
 import { useGame } from '../context/GameContext';
 import { formatTime } from '../utils/gameUtils';
 
-import { Star } from 'lucide-react';
+import { Star, Gem } from 'lucide-react';
 
 const GameStatus = () => {
   const { state } = useGame();
-  const { score, timeRemaining, gameMode, words, level, stars } = state;
+  const { score, timeRemaining, gameMode, words, level, stars, diamonds } = state;
 
   return (
     <div className="absolute top-2 md:top-4 left-2 right-2 md:left-4 md:right-4 z-10 pointer-events-none">
@@ -36,6 +36,17 @@ const GameStatus = () => {
               <span className="text-white text-xl md:text-3xl font-black drop-shadow-md leading-none">{stars}</span>
             </div>
           </div>
+
+          {/* Diamonds Badge */}
+          {diamonds > 0 && (
+            <div className="bg-fuchsia-400 border-4 border-fuchsia-500 rounded-xl md:rounded-2xl p-1 md:p-2 px-2 md:px-4 shadow-[0_4px_0_rgb(192,38,211)] flex items-center transform -rotate-1 pointer-events-auto">
+              <Gem className="w-4 h-4 md:w-6 md:h-6 text-fuchsia-100 fill-current mr-1 md:mr-2 drop-shadow-md" />
+              <div className="flex flex-col items-center">
+                <span className="text-fuchsia-900 text-[10px] md:text-xs font-black uppercase tracking-wider leading-none">Gems</span>
+                <span className="text-white text-xl md:text-3xl font-black drop-shadow-md leading-none">{diamonds}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Time Badge (if timed) */}
