@@ -26,6 +26,7 @@ interface GameState {
   stars: number;
   highScore: number;
   totalLongWords: number;
+  totalRegularWords: number;
   diamonds: number;
   usedRandomWords: string[];
   suggestedWord: string | null;
@@ -48,6 +49,7 @@ const initialState: GameState = {
   stars: 0,
   highScore: 0,
   totalLongWords: 0,
+  totalRegularWords: 0,
   diamonds: 0,
   usedRandomWords: [],
   suggestedWord: null
@@ -99,8 +101,20 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
     case 'ADD_WORD': {
       const isLongWord = action.payload.word.length > 7;
-      const newTotalLongWords = isLongWord ? (state.totalLongWords || 0) + 1 : (state.totalLongWords || 0);
-      const newDiamonds = (isLongWord && newTotalLongWords > 0 && newTotalLongWords % 5 === 0)
+
+      let newTotalLongWords = state.totalLongWords || 0;
+      let newTotalRegularWords = state.totalRegularWords || 0;
+      let earnedDiamond = false;
+
+      if (isLongWord) {
+        newTotalLongWords += 1;
+        if (newTotalLongWords % 5 === 0) earnedDiamond = true;
+      } else {
+        newTotalRegularWords += 1;
+        if (newTotalRegularWords % 15 === 0) earnedDiamond = true;
+      }
+
+      const newDiamonds = earnedDiamond
         ? (state.diamonds || 0) + 1
         : (state.diamonds || 0);
 
@@ -108,6 +122,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         words: [...state.words, action.payload],
         totalLongWords: newTotalLongWords,
+        totalRegularWords: newTotalRegularWords,
         diamonds: newDiamonds
       };
     }

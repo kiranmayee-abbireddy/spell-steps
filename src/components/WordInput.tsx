@@ -85,8 +85,14 @@ const WordInput = () => {
 
       // Calculate diamond logic for notification
       const isLongWord = word.length > 7;
+
       const currentLongWords = state.totalLongWords || 0;
-      const earnedDiamond = isLongWord && ((currentLongWords + 1) % 5 === 0);
+      const earnedLongDiamond = isLongWord && ((currentLongWords + 1) % 5 === 0);
+
+      const currentRegularWords = state.totalRegularWords || 0;
+      const earnedRegularDiamond = !isLongWord && ((currentRegularWords + 1) % 15 === 0);
+
+      const earnedDiamond = earnedLongDiamond || earnedRegularDiamond;
 
       // Set success message
       let msg = stone.special
@@ -94,7 +100,11 @@ const WordInput = () => {
         : `Good job! "${word}" added a stone.`;
 
       if (earnedDiamond) {
-        msg = `💎 You earned a Gem for typing 5 long words! 💎 ` + msg;
+        if (earnedLongDiamond) {
+          msg = `💎 You earned a Gem for typing 5 long words! 💎 ` + msg;
+        } else if (earnedRegularDiamond) {
+          msg = `💎 You earned a Gem for typing 15 regular words! 💎 ` + msg;
+        }
       }
 
       dispatch({
