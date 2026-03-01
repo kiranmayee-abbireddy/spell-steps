@@ -10,7 +10,7 @@ Welcome to **Spell Steps**! A magical word-typing and bridge-building game where
 
 ## Features ✨
 
-* **Dynamic Word Fetching:** Words fall from the sky; type them fast to build stepping stones!
+* **Typing Challenge:** Type words quickly and correctly to build solid stepping stones and help the character cross the river!
 * **Dictionary API Support:** Comprehensive dictionary fallback validating and checking meanings.
 * **Progressive Difficulty:** Experience harder words and faster challenges as your level increases.
 * **Special Words & Gems:** Some words are enchanted, unlocking special stones and magical gems.
